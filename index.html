@@ -6,9 +6,7 @@
     <title>UbeStudy</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --ube: #957DAD; --dark-ube: #4A148C; --light-ube: #F3E5F5; --bg: #F8F9FE; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Nunito', sans-serif; }
@@ -16,8 +14,9 @@
         .view { display: none; min-height: 100vh; width: 100%; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
         .view.active { display: flex; }
         .card { background: white; padding: 40px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; max-width: 360px; text-align: center; }
-        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 2px solid #EEE; outline: none; font-size: 16px; }
-        .btn { width: 100%; padding: 15px; background: var(--ube); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 15px; font-size: 16px; }
+        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 2px solid #EEE; outline: none; }
+        .btn { width: 100%; padding: 15px; background: var(--ube); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 15px; transition: 0.3s; }
+        .btn:hover { background: var(--dark-ube); }
         .phone-frame { width: 310px; height: 550px; background: #000; border: 8px solid #333; border-radius: 40px; position: relative; overflow: hidden; margin-top: 20px; }
         .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
         .lock-overlay.hidden { opacity: 0; pointer-events: none; }
@@ -42,14 +41,14 @@
             <h2 style="color: var(--dark-ube)">Create Account</h2>
             <input type="text" id="reg-name" placeholder="Full Name">
             <input type="email" id="reg-email" placeholder="Email">
-            <input type="password" id="reg-pass" placeholder="Password (min 6 chars)">
+            <input type="password" id="reg-pass" placeholder="Password">
             <button class="btn" onclick="app.signup()">Join the Ube Club</button>
             <p style="margin-top: 20px; font-size: 14px;">Have an account? <a href="javascript:app.show('view-login')" style="color: var(--ube); font-weight: 700;">Login</a></p>
         </div>
     </div>
 
     <div id="view-dash" class="view">
-        <h1 id="user-title" style="color: var(--dark-ube);">Hello! 👋</h1>
+        <h1 id="user-title" style="color: var(--dark-ube); margin-bottom: 20px;">Hello! 👋</h1>
         <button class="btn" style="max-width:300px" onclick="app.show('view-reward')">Start Reward Mode</button>
         <button onclick="app.logout()" style="margin-top: 30px; background: none; border: none; color: #AAA; cursor: pointer;">Sign Out</button>
     </div>
@@ -71,16 +70,12 @@
     </div>
 
     <script>
-        // Use ONLY the Publishable key - Project ID extracted from your URL
+        // Use YOUR URL and YOUR Publishable Key
         const SUPABASE_URL = 'https://lhz46yyisbtub-9ksd9um.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_lhz46yyiSbTUb-9ksd9umA_vQJIdl3Q';
         
-        let sb;
-        try {
-            sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        } catch(e) {
-            console.error("Supabase load error:", e);
-        }
+        // Initialize the client
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const QUESTIONS = [
             { q: "Gestation of a sow?", a: 0, opts: ["114 Days", "150 Days", "200 Days"] },
@@ -107,10 +102,10 @@
                         options: { data: { full_name: name } } 
                     });
                     if(error) throw error;
-                    alert("Success! Check Supabase Users tab.");
+                    alert("Account created! Check your Supabase dashboard.");
                     this.show('view-login');
                 } catch(err) {
-                    alert("Error: " + err.message);
+                    alert("⚠️ Sign Up Error: " + err.message);
                 }
             },
             async login() {
@@ -122,7 +117,7 @@
                     if(error) throw error;
                     this.checkUser();
                 } catch(err) {
-                    alert("Login Error: " + err.message);
+                    alert("⚠️ Login Error: " + err.message);
                 }
             },
             async logout() { await sb.auth.signOut(); this.show('view-login'); },
@@ -166,4 +161,5 @@
         app.checkUser();
     </script>
 </body>
+    
 </html>
