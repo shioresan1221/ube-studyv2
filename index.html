@@ -10,28 +10,29 @@
 <style>
 :root { --ube:#957DAD; --dark:#4A148C; --bg:#F8F9FE; }
 * { box-sizing:border-box; font-family:'Nunito', sans-serif; }
-body { background:var(--bg); margin:0; min-height: 100vh; display:flex; align-items:center; justify-content:center; }
+body { background:var(--bg); margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; }
 
 /* Views */
-.view { display:none; width:100%; max-width:500px; padding:20px; text-align:center; }
+.view { display:none; width:100%; max-width:480px; padding:15px; text-align:center; }
 .view.active { display:flex; flex-direction:column; align-items:center; }
 
 /* Cards and buttons */
-.card { background:white; padding:30px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.05); width:100%; }
+.card { background:white; padding:20px; border-radius:20px; box-shadow:0 5px 15px rgba(0,0,0,0.1); width:100%; margin:10px 0; }
 input { width:100%; padding:12px; margin:8px 0; border-radius:10px; border:2px solid #eee; font-size:15px; outline:none; }
-button { width:100%; padding:14px; border:none; border-radius:12px; font-weight:800; cursor:pointer; margin-top:15px; background:var(--ube); color:white; transition:0.3s; }
+button { width:100%; padding:14px; border:none; border-radius:12px; font-weight:800; cursor:pointer; margin-top:10px; background:var(--ube); color:white; transition:0.3s; }
 button:hover { background:var(--dark); }
 
 /* Subject cards */
-.subject-card { background:#F9F9F9; margin:10px 0; padding:12px; border-radius:12px; cursor:pointer; position:relative; text-align:left; }
+.subject-card { background:#F9F9F9; margin:8px 0; padding:12px; border-radius:12px; cursor:pointer; position:relative; text-align:left; font-size:16px; }
 .subject-card:hover .desc { display:block; }
-.desc { display:none; position:absolute; top:0; left:105%; width:200px; background:white; border:1px solid #ccc; padding:10px; border-radius:10px; font-size:13px; box-shadow:0 4px 10px rgba(0,0,0,0.1); z-index:10; }
+.desc { display:none; position:absolute; top:0; left:105%; width:200px; background:white; border:1px solid #ccc; padding:8px; border-radius:10px; font-size:13px; box-shadow:0 4px 10px rgba(0,0,0,0.1); z-index:10; }
 
-.level { margin:10px 0; font-size:14px; }
-
-/* Status */
+/* Level & status */
+.level { margin:10px 0; font-size:14px; text-align:left; }
 #status { margin-top:10px; font-weight:bold; font-size:14px; color:red; }
 .switch { margin-top:10px; font-size:14px; cursor:pointer; color:var(--dark); font-weight:700; }
+.ranking-card { text-align:left; padding:10px; margin:6px 0; background:#F0F0F0; border-radius:10px; }
+.ranking-name { font-weight:700; }
 </style>
 </head>
 <body>
@@ -56,6 +57,7 @@ button:hover { background:var(--dark); }
     <h3>Select a Subject:</h3>
     <div id="subjects-container"></div>
     <div class="level" id="user-level"></div>
+    <button onclick="app.showRanking()" style="background:#ddd;color:#333;">View Rankings</button>
     <button style="background:#ddd;color:#666;" onclick="app.logout()">Logout</button>
 </div>
 
@@ -67,9 +69,9 @@ button:hover { background:var(--dark); }
     <button onclick="app.showView('view-home')" style="background:#ddd;color:#666;margin-top:20px;">Back to Subjects</button>
 </div>
 
-<!-- Ranking -->
+<!-- Ranking View -->
 <div id="view-ranking" class="view">
-    <h2 style="color:var(--dark)">Ranking</h2>
+    <h2 style="color:var(--dark)">Leaderboard</h2>
     <div id="ranking-list"></div>
     <button onclick="app.showView('view-home')" style="background:#ddd;color:#666;margin-top:20px;">Back</button>
 </div>
@@ -103,9 +105,8 @@ const LEVELS = [
 
 // --- APP ---
 window.app = {
-    user: null,
-    levelPoints: 0,
-
+    user:null,
+    levelPoints:0,
     showView(id){
         document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
@@ -119,7 +120,7 @@ window.app = {
 
         status.style.color="blue"; status.innerText="Processing...";
 
-        try {
+        try{
             let res;
             if(this.isLogin){
                 res = await supabase.auth.signInWithPassword({email,password});
@@ -138,7 +139,7 @@ window.app = {
     async loadHome(){
         const { data:{ user } } = await supabase.auth.getUser();
         if(user){
-            this.user = user;
+            this.user=user;
             document.getElementById("user-name").innerText = user.user_metadata.full_name || "Student";
             this.showSubjects();
             this.showView("view-home");
@@ -183,6 +184,27 @@ window.app = {
             container.appendChild(btn);
         });
         this.showView("view-subject");
+    },
+
+    async showRanking(){
+        // Fetch top users per subject from Supabase table "user_scores"
+        const { data, error } = await supabase
+            .from("user_scores")
+            .select("user_name,subject,points")
+            .order("points",{ascending:false})
+            .limit(20);
+        const container = document.getElementById("ranking-list");
+        container.innerHTML="";
+        if(error) container.innerText="Error loading rankings";
+        else{
+            data.forEach((r,i)=>{
+                const div = document.createElement("div");
+                div.className="ranking-card";
+                div.innerHTML=`${i+1}. <span class="ranking-name">${r.user_name}</span> - ${r.subject}: ${r.points} pts`;
+                container.appendChild(div);
+            });
+        }
+        this.showView("view-ranking");
     }
 };
 
@@ -198,7 +220,6 @@ document.getElementById("toggleMode").onclick=()=>{
 
 // --- CHECK LOGIN ---
 app.loadHome();
-
 </script>
 </body>
 </html>
