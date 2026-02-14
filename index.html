@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UbeStudy - Live</title>
+    <title>UbeStudy</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,29 +11,16 @@
         :root { --ube: #957DAD; --dark-ube: #4A148C; --light-ube: #F3E5F5; --bg: #F8F9FE; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Nunito', sans-serif; }
         body { background: var(--bg); color: #333; overflow-x: hidden; }
-
-        .view { display: none; min-height: 100vh; width: 100%; align-items: center; justify-content: center; flex-direction: column; }
+        .view { display: none; min-height: 100vh; width: 100%; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
         .view.active { display: flex; }
-
-        /* Auth UI */
         .card { background: white; padding: 40px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; max-width: 360px; text-align: center; }
-        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 2px solid #EEE; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--ube); }
+        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 2px solid #EEE; outline: none; }
         .btn { width: 100%; padding: 15px; background: var(--ube); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 15px; transition: 0.3s; }
-        .btn:hover { background: var(--dark-ube); transform: translateY(-2px); }
-
-        /* Dashboard UI */
-        .dash-container { width: 100%; max-width: 450px; padding: 25px; }
-        .mascot { width: 60px; height: 60px; background: var(--ube); border-radius: 50%; display: grid; place-items: center; box-shadow: 0 10px 20px rgba(149,125,173,0.3); animation: float 3s infinite; margin: 0 0 20px auto; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-        /* Reward Mode UI */
-        .phone-frame { width: 340px; height: 650px; background: #000; border: 8px solid #333; border-radius: 40px; position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
-        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; transition: 0.5s; }
+        .btn:hover { background: var(--dark-ube); }
+        .phone-frame { width: 320px; height: 580px; background: #000; border: 8px solid #333; border-radius: 40px; position: relative; overflow: hidden; margin-top: 20px; }
+        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; transition: 0.5s; }
         .lock-overlay.hidden { opacity: 0; pointer-events: none; }
-        .quiz-side { width: 100%; max-width: 400px; padding: 20px; background: #fff; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .opt-btn { background: #F0F0F0; padding: 12px; border-radius: 10px; margin: 8px 0; cursor: pointer; font-weight: 600; transition: 0.2s; }
-        .opt-btn:hover { background: var(--light-ube); }
+        .opt-btn { background: #F0F0F0; padding: 12px; border-radius: 10px; margin: 8px 0; cursor: pointer; font-weight: 600; width: 100%; text-align: center; }
         .timer-line { position: absolute; bottom: 0; left: 0; height: 6px; background: var(--ube); width: 0%; z-index: 20; }
     </style>
 </head>
@@ -41,12 +28,12 @@
 
     <div id="view-login" class="view active">
         <div class="card">
-            <h1 style="color: var(--dark-ube); margin-bottom: 10px;">🍠 UbeStudy</h1>
-            <p style="color: #888;">Log in to your account</p>
+            <h1 style="color: var(--dark-ube);">🍠 UbeStudy</h1>
+            <p style="color: #888; margin-bottom: 10px;">Login</p>
             <input type="email" id="login-email" placeholder="Email">
             <input type="password" id="login-pass" placeholder="Password">
             <button class="btn" onclick="app.login()">Login</button>
-            <p style="margin-top: 20px; font-size: 14px;">New here? <a href="javascript:app.show('view-signup')" style="color: var(--ube); font-weight: 700;">Sign Up</a></p>
+            <p style="margin-top: 20px; font-size: 14px;">New? <a href="javascript:app.show('view-signup')" style="color: var(--ube); font-weight: 700;">Sign Up</a></p>
         </div>
     </div>
 
@@ -57,94 +44,73 @@
             <input type="email" id="reg-email" placeholder="Email">
             <input type="password" id="reg-pass" placeholder="Password (min 6 chars)">
             <button class="btn" onclick="app.signup()">Join the Ube Club</button>
-            <p style="margin-top: 20px; font-size: 14px;">Already have one? <a href="javascript:app.show('view-login')" style="color: var(--ube); font-weight: 700;">Login</a></p>
+            <p style="margin-top: 20px; font-size: 14px;">Have an account? <a href="javascript:app.show('view-login')" style="color: var(--ube); font-weight: 700;">Login</a></p>
         </div>
     </div>
 
     <div id="view-dash" class="view">
-        <div class="dash-container">
-            <div class="mascot" style="color:white; font-weight:bold;">◕‿◕</div>
-            <h1 id="user-title" style="color: var(--dark-ube); font-size: 32px;">Hello! 👋</h1>
-            <div style="background: white; padding: 20px; border-radius: 20px; margin: 20px 0;">
-                <p style="font-weight: 700;">Daily Progress</p>
-                <div style="height: 10px; background: #EEE; border-radius: 5px; margin-top: 10px;">
-                    <div style="width: 40%; height: 100%; background: var(--ube); border-radius: 5px;"></div>
-                </div>
-            </div>
-            <button class="btn" onclick="app.show('view-reward')"><i class="fa-brands fa-tiktok"></i> Start Reward Mode</button>
-            <button onclick="app.logout()" style="margin-top: 30px; width: 100%; background: none; border: none; color: #AAA; cursor: pointer;">Sign Out</button>
-        </div>
+        <h1 id="user-title" style="color: var(--dark-ube); margin-bottom: 20px;">Hello! 👋</h1>
+        <button class="btn" style="max-width:300px" onclick="app.show('view-reward')">Start Reward Mode</button>
+        <button onclick="app.logout()" style="margin-top: 30px; background: none; border: none; color: #AAA; cursor: pointer;">Sign Out</button>
     </div>
 
     <div id="view-reward" class="view" style="background: #f0f2f5;">
-        <button onclick="app.show('view-dash')" style="margin-bottom: 20px; background: none; border: none; color: var(--ube); font-weight: 800; cursor: pointer;"><i class="fa-solid fa-chevron-left"></i> Exit to Dashboard</button>
-        
-        <div class="quiz-side">
-            <h3 id="q-text" style="margin-bottom: 15px;">Loading...</h3>
+        <div class="card" style="margin-bottom: 20px;">
+            <h3 id="q-text">Loading...</h3>
             <div id="options-box"></div>
         </div>
-
         <div class="phone-frame">
             <iframe id="video-player" src="" frameborder="0" style="width:100%; height:100%;"></iframe>
             <div id="lock" class="lock-overlay">
-                <i class="fa-solid fa-lock" style="font-size: 40px; margin-bottom: 15px; color: var(--ube);"></i>
-                <h2 style="margin-bottom: 10px;">Locked</h2>
-                <p style="font-size: 14px; opacity: 0.8;">Solve the quiz to watch!</p>
+                <i class="fa-solid fa-lock" style="font-size: 30px; margin-bottom: 10px; color: var(--ube);"></i>
+                <p>Solve to Unlock 15s</p>
             </div>
             <div id="timer-bar" class="timer-line"></div>
         </div>
+        <button onclick="app.show('view-dash')" style="margin-top: 20px; color: var(--ube); border: none; background: none; font-weight: 800; cursor: pointer;">Exit</button>
     </div>
 
     <script>
-        // --- DATA ---
-        const QUESTIONS = [
-            { q: "How many days is a sow's gestation?", a: 0, opts: ["114 Days", "150 Days", "60 Days"] },
-            { q: "What is the main carbohydrate in rice?", a: 1, opts: ["Gluten", "Starch", "Fiber"] },
-            { q: "Scientific name of a domestic pig?", a: 2, opts: ["Gallus gallus", "Oryza sativa", "Sus scrofa"] }
-        ];
-        const REELS = ["tG7tuqXo5zQ", "ArU1b5j-JQI", "CDtP8nZ-0aU", "jNQXAC9IVRw"];
-
-        // --- SUPABASE CONFIG ---
+        // Use YOUR URL and ONLY the Publishable key
         const SUPABASE_URL = 'https://lhz46yyisbtub-9ksd9um.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_lhz46yyiSbTUb-9ksd9umA_vQJIdl3Q';
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // --- APP ENGINE ---
+        const QUESTIONS = [
+            { q: "Gestation of a sow?", a: 0, opts: ["114 Days", "150 Days", "200 Days"] },
+            { q: "Main nutrient in rice?", a: 1, opts: ["Fat", "Carbs", "Protein"] }
+        ];
+        const REELS = ["tG7tuqXo5zQ", "ArU1b5j-JQI", "CDtP8nZ-0aU"];
+
         const app = {
             currentIdx: 0,
-
             show(id) {
                 document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
                 document.getElementById(id).classList.add('active');
                 if(id === 'view-reward') this.initQuiz();
             },
-
             async signup() {
                 const email = document.getElementById('reg-email').value;
                 const password = document.getElementById('reg-pass').value;
                 const name = document.getElementById('reg-name').value;
                 const { error } = await sb.auth.signUp({ email, password, options: { data: { full_name: name } } });
-                if(error) alert(error.message);
-                else { alert("Sign up success! Please login."); this.show('view-login'); }
+                if(error) alert(error.message); else { alert("Account created! Now please Login."); this.show('view-login'); }
             },
-
             async login() {
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-pass').value;
-                const { error } = await sb.auth.signInWithPassword({ email, password });
-                if(error) alert(error.message); else this.checkSession();
+                const { error } = await sb.auth.signInWithPassword({ 
+                    email: document.getElementById('login-email').value, 
+                    password: document.getElementById('login-pass').value 
+                });
+                if(error) alert(error.message); else this.checkUser();
             },
-
             async logout() { await sb.auth.signOut(); this.show('view-login'); },
-
-            async checkSession() {
+            async checkUser() {
                 const { data: { user } } = await sb.auth.getUser();
                 if(user) {
-                    document.getElementById('user-title').innerText = `Hello, ${user.user_metadata.full_name || 'Student'}! 👋`;
+                    document.getElementById('user-title').innerText = `Hello, ${user.user_metadata.full_name}! 👋`;
                     this.show('view-dash');
                 }
             },
-
             initQuiz() {
                 const q = QUESTIONS[this.currentIdx % QUESTIONS.length];
                 document.getElementById('q-text').innerText = q.q;
@@ -154,20 +120,17 @@
                     const d = document.createElement('div');
                     d.className = 'opt-btn';
                     d.innerText = o;
-                    d.onclick = () => { if(i === q.a) this.unlock(); else alert("Try again!"); };
+                    d.onclick = () => { if(i === q.a) this.unlock(); else alert("Wrong! Try again."); };
                     box.appendChild(d);
                 });
             },
-
             unlock() {
                 const vid = REELS[Math.floor(Math.random() * REELS.length)];
                 document.getElementById('video-player').src = `https://www.youtube.com/embed/${vid}?autoplay=1&controls=0&mute=0&loop=1&playlist=${vid}`;
                 document.getElementById('lock').classList.add('hidden');
-                
                 const bar = document.getElementById('timer-bar');
                 bar.style.transition = 'width 15s linear';
                 bar.style.width = '100%';
-
                 setTimeout(() => {
                     document.getElementById('lock').classList.remove('hidden');
                     document.getElementById('video-player').src = "";
@@ -178,9 +141,7 @@
                 }, 15000);
             }
         };
-
-        // Auto-check session on load
-        app.checkSession();
+        app.checkUser();
     </script>
 </body>
 </html>
