@@ -1,4 +1,4 @@
-<!DOCTYPE html><!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html><!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -78,9 +78,8 @@ button:hover { background:var(--dark); }
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-/* 🔥 REPLACE THESE */
-const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co";
-const SUPABASE_KEY = "YOUR_ANON_PUBLIC_KEY";
+const SUPABASE_URL = "https://lhz46yyisbtub.supabase.co";
+const SUPABASE_KEY = "sb_publishable_lhz46yyiSbTUb-9ksd9umA_vQJIdl3Q";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -137,7 +136,7 @@ authBtn.addEventListener("click", async () => {
         } else {
             if (!name) {
                 statusDiv.style.color = "red";
-                statusDiv.innerText = "Name required for signup.";
+                statusDiv.innerText = "Name required.";
                 return;
             }
 
@@ -167,4 +166,5 @@ authBtn.addEventListener("click", async () => {
 
 </body>
 </html>
+
 
