@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --ube: #957DAD; --dark-ube: #4A148C; --bg: #F8F9FE; }
-        body { font-family: sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        body { font-family: 'Nunito', sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         .card { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 320px; text-align: center; }
         input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
         .btn { width: 100%; padding: 12px; background: var(--ube); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
@@ -28,11 +28,16 @@
     </div>
 
     <script>
-        // TRIPLE CHECK THESE COPIED FROM YOUR SUPABASE SETTINGS
-        const SB_URL = 'https://lhz46yyisbtub-9ksd9um.supabase.co';
-        const SB_KEY = 'sb_publishable_lhz46yyiSbTUb-9ksd9umA_vQJIdl3Q';
+        // --- ⬇️ PASTE YOUR NEW KEY BELOW ⬇️ ---
         
-        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+        const SUPABASE_URL = 'https://lhz46yyisbtub-9ksd9um.supabase.co';
+        
+        // This MUST start with "eyJ..."
+        const SUPABASE_KEY = 'PASTE_YOUR_LONG_EYJ_KEY_HERE'; 
+
+        // ----------------------------------------
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let isLogin = false;
 
         function toggleMode() {
@@ -59,11 +64,10 @@
                         options: { data: { full_name: name } }
                     });
                     if (error) throw error;
-                    alert("Account Created! Refresh your Supabase Users tab now.");
+                    alert("Account Created! You are now in the database.");
                 }
             } catch (err) {
-                console.error(err);
-                alert("Connection Error: " + err.message + "\n\nTip: Make sure you are using HTTPS and that 'Confirm Email' is OFF in Supabase.");
+                alert("Error: " + err.message);
             }
         }
     </script>
