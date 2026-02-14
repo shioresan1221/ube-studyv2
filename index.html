@@ -33,6 +33,11 @@ button:hover { background:var(--dark); }
 .switch { margin-top:10px; font-size:14px; cursor:pointer; color:var(--dark); font-weight:700; }
 .ranking-card { text-align:left; padding:10px; margin:6px 0; background:#F0F0F0; border-radius:10px; }
 .ranking-name { font-weight:700; }
+
+/* Mobile responsive */
+@media(max-width:480px){
+    .desc { left:50%; transform:translateX(10px); width:180px; font-size:12px; }
+}
 </style>
 </head>
 <body>
@@ -107,6 +112,8 @@ const LEVELS = [
 window.app = {
     user:null,
     levelPoints:0,
+    isLogin:false,
+
     showView(id){
         document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
         document.getElementById(id).classList.add('active');
@@ -117,7 +124,6 @@ window.app = {
         const password = document.getElementById("password").value;
         const name = document.getElementById("name").value;
         const status = document.getElementById("status");
-
         status.style.color="blue"; status.innerText="Processing...";
 
         try{
@@ -187,7 +193,6 @@ window.app = {
     },
 
     async showRanking(){
-        // Fetch top users per subject from Supabase table "user_scores"
         const { data, error } = await supabase
             .from("user_scores")
             .select("user_name,subject,points")
@@ -218,7 +223,7 @@ document.getElementById("toggleMode").onclick=()=>{
     document.getElementById("toggleMode").innerText = app.isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login";
 };
 
-// --- CHECK LOGIN ---
+// --- INIT ---
 app.loadHome();
 </script>
 </body>
