@@ -1,4 +1,4 @@
-<!DOCTYPE html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -78,9 +78,9 @@ button:hover { background:var(--dark); }
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-/* ✅ YOUR REAL SUPABASE CONFIG */
-const SUPABASE_URL = "https://tbftpvkydneckzdpdev.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiZnRwdmt5ZG5lY2t6ZHBmZGV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwNDQxMDIsImV4cCI6MjA4NjYyMDEwMn0.21_APgXQVIeVSuHsNMqa55UGNFOEdDUYvNaUI1_XkY4";
+/* ✅ Correct Supabase Config */
+const SUPABASE_URL = "https://tbftpvkydneckzdpfdev.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiZnRwdmt5ZWNrzdHBmZGV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwNDQxMDIsImV4cCI6MjA4NjYyMDEwMn0.21_APgXQVIeVSuHsNMqa55UGNFOEdDUYvNaUI1_XkY4";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -133,23 +133,17 @@ authBtn.addEventListener("click", async () => {
         let response;
 
         if (isLogin) {
-            response = await supabase.auth.signInWithPassword({
-                email,
-                password
-            });
+            response = await supabase.auth.signInWithPassword({ email, password });
         } else {
             if (!name) {
                 statusDiv.style.color = "red";
                 statusDiv.innerText = "Full name required.";
                 return;
             }
-
             response = await supabase.auth.signUp({
                 email,
                 password,
-                options: {
-                    data: { full_name: name }
-                }
+                options: { data: { full_name: name } }
             });
         }
 
@@ -172,5 +166,3 @@ authBtn.addEventListener("click", async () => {
 
 </body>
 </html>
-
-
