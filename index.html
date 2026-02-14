@@ -1,8 +1,8 @@
-<!DOCTYPE html><!DOCTYPE html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>UbeStudy Auth</title>
+<title>🍠 UbeStudy Auth</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
 
@@ -78,8 +78,10 @@ button:hover { background:var(--dark); }
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-const SUPABASE_URL = "https://lhz46yyisbtub.supabase.co";
-const SUPABASE_KEY = "sb_publishable_lhz46yyiSbTUb-9ksd9umA_vQJIdl3Q";
+/* ✅ YOUR REAL SUPABASE CONFIG */
+const SUPABASE_URL = "https://tbftpvkydneckzdpdev.supabase.co";
+
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiZnRwdmt5ZG5lY2t6ZHBmZGV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwNDQxMDIsImV4cCI6MjA4NjYyMDEwMn0.21_APgXQVIeVSuHsNMqa55UGNFOEdDUYvNaUI1_XkY4";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -93,6 +95,7 @@ const toggle = document.getElementById("toggleMode");
 const statusDiv = document.getElementById("status");
 const title = document.getElementById("formTitle");
 
+/* Toggle Login / Signup */
 toggle.addEventListener("click", () => {
     isLogin = !isLogin;
 
@@ -111,14 +114,16 @@ toggle.addEventListener("click", () => {
     statusDiv.innerText = "";
 });
 
+/* Auth Action */
 authBtn.addEventListener("click", async () => {
-    const email = emailInput.value;
-    const password = passInput.value;
-    const name = nameInput.value;
+
+    const email = emailInput.value.trim();
+    const password = passInput.value.trim();
+    const name = nameInput.value.trim();
 
     if (!email || !password) {
         statusDiv.style.color = "red";
-        statusDiv.innerText = "Fill all required fields.";
+        statusDiv.innerText = "Please fill all required fields.";
         return;
     }
 
@@ -136,35 +141,35 @@ authBtn.addEventListener("click", async () => {
         } else {
             if (!name) {
                 statusDiv.style.color = "red";
-                statusDiv.innerText = "Name required.";
+                statusDiv.innerText = "Full name required.";
                 return;
             }
 
             response = await supabase.auth.signUp({
                 email,
                 password,
-                options: { data: { full_name: name } }
+                options: {
+                    data: { full_name: name }
+                }
             });
         }
 
         if (response.error) throw response.error;
 
         statusDiv.style.color = "green";
-        statusDiv.innerText = isLogin 
+        statusDiv.innerText = isLogin
             ? "Login successful 🎉"
             : "Signup successful! Check your email.";
 
-        console.log(response.data);
+        console.log("Auth Success:", response.data);
 
     } catch (err) {
         statusDiv.style.color = "red";
         statusDiv.innerText = err.message;
-        console.error(err);
+        console.error("Auth Error:", err);
     }
 });
 </script>
 
 </body>
 </html>
-
-
