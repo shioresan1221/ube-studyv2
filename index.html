@@ -1,265 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>🍠 UbeStudy - Full App</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <title>🍠 UbeStudy - Full App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<style>
-:root { --ube:#957DAD; --dark:#4A148C; --bg:#F8F9FE; }
-* { box-sizing:border-box; font-family:'Nunito', sans-serif; }
-body { background:var(--bg); margin:0; min-height: 100vh; display:flex; align-items:center; justify-content:center; flex-direction:column; padding:20px; }
+    <style>
+        :root { --ube:#957DAD; --dark:#4A148C; --bg:#F8F9FE; }
+        * { box-sizing:border-box; font-family:'Nunito', sans-serif; }
+        body { background:var(--bg); margin:0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        
+        .view { display: none; width: 100%; max-width: 400px; padding: 20px; text-align: center; }
+        .view.active { display: flex; flex-direction: column; align-items: center; }
 
-.view { display: none; width: 100%; max-width: 500px; padding: 20px; text-align: center; }
-.view.active { display: flex; flex-direction: column; align-items: center; }
+        .card { background:white; padding:40px; border-radius:25px; box-shadow:0 10px 30px rgba(0,0,0,0.05); width: 100%; }
+        input { width:100%; padding:14px; margin:10px 0; border-radius:12px; border:2px solid #eee; font-size:15px; outline: none; }
+        
+        button { width:100%; padding:15px; border:none; border-radius:12px; font-weight:800; cursor:pointer; margin-top:15px; background:var(--ube); color:white; transition: 0.3s; }
+        button:hover { background:var(--dark); }
 
-.card { background:white; padding:40px; border-radius:25px; box-shadow:0 10px 30px rgba(0,0,0,0.05); width: 100%; }
-input { width:100%; padding:14px; margin:10px 0; border-radius:12px; border:2px solid #eee; font-size:15px; outline:none; }
-button { width:100%; padding:15px; border:none; border-radius:12px; font-weight:800; cursor:pointer; margin-top:15px; background:var(--ube); color:white; transition:0.3s; }
-button:hover { background:var(--dark); }
-
-/* Dashboard subjects */
-.subjects { display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap:20px; width:100%; margin-top:20px; }
-.subject { background:white; padding:20px; border-radius:20px; text-align:center; box-shadow:0 5px 15px rgba(0,0,0,0.1); cursor:pointer; position:relative; transition: transform 0.2s; }
-.subject:hover { transform: scale(1.05); }
-.tooltip { display:none; position:absolute; bottom:110%; left:50%; transform:translateX(-50%); background: var(--dark); color:white; padding:10px; border-radius:10px; font-size:14px; width:200px; z-index:10; }
-.subject:hover .tooltip { display:block; }
-
-/* Levels */
-.levels { margin-top:20px; text-align:center; }
-.level { font-size:16px; margin:3px 0; }
-
-/* Mode selection */
-.mode-selection { display:none; margin-top:20px; }
-.mode-selection.active { display:block; }
-.mode-selection button { padding:10px 15px; margin:5px; border:none; border-radius:10px; cursor:pointer; background: var(--ube); color:white; font-weight:600; transition:0.3s; }
-.mode-selection button:hover { background: var(--dark); }
-
-/* Quiz */
-.phone-frame { width: 300px; height: 540px; background: #000; border: 8px solid #333; border-radius: 40px; position: relative; overflow: hidden; margin-top: 20px; }
-.lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 10; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; transition:0.5s; }
-.lock-overlay.hidden { opacity:0; pointer-events:none; }
-.opt-btn { background: #F0F0F0; padding:12px; border-radius:10px; margin:8px 0; cursor:pointer; font-weight:600; width:100%; text-align:center; color:#333; }
-.timer-line { position:absolute; bottom:0; left:0; height:6px; background: var(--ube); width:0%; z-index:20; }
-.hidden { display:none; }
-.switch { margin-top:15px; font-size:14px; cursor:pointer; color:var(--dark); font-weight:700; }
-#status { margin-top:15px; font-weight:bold; font-size:14px; }
-</style>
+        .phone-frame { width: 300px; height: 540px; background: #000; border: 8px solid #333; border-radius: 40px; position: relative; overflow: hidden; margin-top: 20px; }
+        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; transition: 0.5s; }
+        .lock-overlay.hidden { opacity: 0; pointer-events: none; }
+        .opt-btn { background: #F0F0F0; padding: 12px; border-radius: 10px; margin: 8px 0; cursor: pointer; font-weight: 600; width: 100%; text-align: center; color: #333; }
+        .timer-line { position: absolute; bottom: 0; left: 0; height: 6px; background: var(--ube); width: 0%; z-index: 20; }
+        
+        .switch { margin-top:15px; font-size:14px; cursor:pointer; color:var(--dark); font-weight: 700; }
+        #status { margin-top:15px; font-weight:bold; font-size:14px; }
+        .hidden { display:none; }
+    </style>
 </head>
 <body>
 
-<!-- AUTH VIEW -->
-<div id="view-auth" class="view active">
-    <div class="card">
-        <h1 style="color:var(--dark)">🍠 UbeStudy</h1>
-        <h3 id="formTitle">Sign Up</h3>
-        <input type="text" id="name" placeholder="Full Name">
-        <input type="email" id="email" placeholder="Email">
-        <input type="password" id="password" placeholder="Password">
-        <button id="authBtn">Create Account</button>
-        <div class="switch" id="toggleMode">Already have an account? Login</div>
-        <div id="status"></div>
-    </div>
-</div>
-
-<!-- DASHBOARD -->
-<div id="view-dash" class="view">
-    <h1 style="color:var(--dark)">Welcome!</h1>
-
-    <div class="levels">
-        <div class="level">🌱 Seedling (Level 1-5)</div>
-        <div class="level">👨‍🌾 Backyard Gardener (Level 6-10)</div>
-        <div class="level">🚜 Field Manager (Level 11-20)</div>
-        <div class="level">🌾 Agronomist (Level 21-40)</div>
-        <div class="level">👑 Secretary of Agriculture (Level 50)</div>
-    </div>
-
-    <div class="subjects">
-        <div class="subject" onclick="selectSubject('Crop Science')">
-            Crop Science
-            <div class="tooltip">Covers principles of agronomy, field crops, horticulture, physiology, and plant breeding.</div>
-        </div>
-        <div class="subject" onclick="selectSubject('Soil Science')">
-            Soil Science
-            <div class="tooltip">Focuses on soil management, fertility, and conservation.</div>
-        </div>
-        <div class="subject" onclick="selectSubject('Crop Protection')">
-            Crop Protection
-            <div class="tooltip">Covers plant pests, diseases, and management.</div>
-        </div>
-        <div class="subject" onclick="selectSubject('Animal Science')">
-            Animal Science
-            <div class="tooltip">Involves livestock production and management.</div>
-        </div>
-        <div class="subject" onclick="selectSubject('Agri Economics')">
-            Agricultural Economics & Marketing
-            <div class="tooltip">Focuses on agribusiness and marketing principles.</div>
-        </div>
-        <div class="subject" onclick="selectSubject('Agri Extension')">
-            Agricultural Extension & Communication
-            <div class="tooltip">Covers communication strategies for agricultural development.</div>
+    <div id="view-auth" class="view active">
+        <div class="card">
+            <h1 style="color:var(--dark)">🍠 UbeStudy</h1>
+            <h3 id="formTitle">Sign Up</h3>
+            <input type="text" id="name" placeholder="Full Name">
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="password" placeholder="Password">
+            <button id="authBtn">Create Account</button>
+            <div class="switch" id="toggleMode">Already have an account? Login</div>
+            <div id="status"></div>
         </div>
     </div>
 
-    <button style="margin-top:15px; background:#ddd; color:#666;" onclick="app.logout()">Logout</button>
-</div>
-
-<!-- MODE SELECTION -->
-<div id="modeSelection" class="mode-selection">
-    <h3 id="selectedSubject">Subject</h3>
-    <p>Choose number of items:</p>
-    <div>
-        <button onclick="startQuiz(15)">15</button>
-        <button onclick="startQuiz(30)">30</button>
-        <button onclick="startQuiz(50)">50</button>
-        <button onclick="startQuiz(70)">70</button>
-        <button onclick="startQuiz(100)">100</button>
-    </div>
-    <button style="margin-top:15px; background:#ddd; color:#666;" onclick="cancelSubject()">Cancel</button>
-</div>
-
-<!-- QUIZ VIEW -->
-<div id="view-quiz" class="view">
-    <h3 id="q-text">Loading Question...</h3>
-    <div id="options-box" style="margin-top:10px;"></div>
-
-    <div class="phone-frame">
-        <iframe id="video-player" src="" frameborder="0" style="width:100%; height:100%; pointer-events:none;"></iframe>
-        <div id="lock" class="lock-overlay">
-            <i class="fa-solid fa-lock" style="font-size:30px; margin-bottom:10px; color:var(--ube)"></i>
-            <p>Solve Question to Unlock</p>
+    <div id="view-dash" class="view">
+        <h1 id="welcome-msg" style="color:var(--dark)">Welcome!</h1>
+        <div class="card">
+            <p>Ready to earn some screen time?</p>
+            <button onclick="app.showView('view-reward')">Start Study Session</button>
+            <button style="background:#ddd; color:#666;" onclick="app.logout()">Logout</button>
         </div>
-        <div id="timer-bar" class="timer-line"></div>
     </div>
 
-    <button onclick="backToDash()" style="background:none; color:var(--ube); width:auto; margin-top:10px;">Exit Session</button>
-</div>
+    <div id="view-reward" class="view">
+        <div class="card" style="margin-bottom: 15px; padding: 20px;">
+            <h3 id="q-text" style="margin:0;">Loading Question...</h3>
+            <div id="options-box" style="margin-top:10px;"></div>
+        </div>
+
+        <div class="phone-frame">
+            <iframe id="video-player" src="" frameborder="0" style="width:100%; height:100%; pointer-events: none;"></iframe>
+            <div id="lock" class="lock-overlay">
+                <i class="fa-solid fa-lock" style="font-size: 30px; margin-bottom: 10px; color: var(--ube);"></i>
+                <p>Solve Question to Unlock</p>
+            </div>
+            <div id="timer-bar" class="timer-line"></div>
+        </div>
+        <button onclick="app.showView('view-dash')" style="background:none; color:var(--ube); width:auto;">Exit Session</button>
+    </div>
 
 <script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-// --- CONFIG ---
-const SUPABASE_URL = "https://tbftpvkydneckzdpfdev.supabase.co";
-const SUPABASE_KEY = "PASTE_YOUR_LONG_EYJ_KEY_HERE"; // Use your valid key
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    // --- CONFIGURATION ---
+    const SUPABASE_URL = "https://tbftpvkydneckzdpfdev.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiZnRwdmt5ZG5lY2t6ZHBmZGV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwNDQxMDIsImV4cCI6MjA4NjYyMDEwMn0.21_APgXQVIeVSuHsNMqa55UGNFOEdDUYvNaUI1_XkY4"; 
 
-// --- DATA ---
-const QUESTIONS = [
-    { q: "Gestation period of a sow?", a: 0, opts:["114 Days","150 Days","200 Days"] },
-    { q: "Main nutrient in corn?", a: 1, opts:["Fat","Carbohydrates","Protein"] },
-    { q: "What is 15 x 4?", a:2, opts:["50","45","60"] }
-];
-const REELS = ["tG7tuqXo5zQ","ArU1b5j-JQI","CDtP8nZ-0aU"];
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-window.app = {
-    isLogin:false,
-    currentQ:0,
+    // --- APP LOGIC ---
+    const QUESTIONS = [
+        { q: "Gestation period of a sow?", a: 0, opts: ["114 Days", "150 Days", "200 Days"] },
+        { q: "Main nutrient in corn?", a: 1, opts: ["Fat", "Carbohydrates", "Protein"] },
+        { q: "What is 15 x 4?", a: 2, opts: ["50", "45", "60"] }
+    ];
+    const REELS = ["tG7tuqXo5zQ", "ArU1b5j-JQI", "CDtP8nZ-0aU"];
 
-    showView(id){
-        document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    },
+    window.app = {
+        isLogin: false,
+        currentQ: 0,
 
-    async handleAuth(){
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
-        const name = document.getElementById("name").value;
-        const status = document.getElementById("status");
-        status.style.color="blue"; status.innerText="Processing...";
+        showView(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'view-reward') this.initQuiz();
+        },
 
-        try {
-            let res;
-            if(this.isLogin){
-                res = await supabase.auth.signInWithPassword({email,password});
-            }else{
-                res = await supabase.auth.signUp({email,password, options:{data:{full_name:name}}});
+        async handleAuth() {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const name = document.getElementById("name").value;
+            const status = document.getElementById("status");
+
+            status.style.color = "blue";
+            status.innerText = "Processing...";
+
+            try {
+                let res;
+                if (this.isLogin) {
+                    res = await supabase.auth.signInWithPassword({ email, password });
+                } else {
+                    res = await supabase.auth.signUp({ email, password, options: { data: { full_name: name } } });
+                }
+                if (res.error) throw res.error;
+
+                if (this.isLogin) {
+                    this.checkUser();
+                } else {
+                    status.style.color = "green";
+                    status.innerText = "Signup successful! Please login.";
+                }
+            } catch (err) {
+                status.style.color = "red";
+                status.innerText = err.message;
             }
-            if(res.error) throw res.error;
+        },
 
-            if(this.isLogin) this.checkUser();
-            else { status.style.color="green"; status.innerText="Signup successful! Please login.";}
-        }catch(err){
-            status.style.color="red"; status.innerText=err.message;
+        async checkUser() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                document.getElementById('welcome-msg').innerText = `Hello, ${user.user_metadata.full_name || 'Ube Student'}! 👋`;
+                this.showView('view-dash');
+            }
+        },
+
+        async logout() {
+            await supabase.auth.signOut();
+            location.reload();
+        },
+
+        initQuiz() {
+            const q = QUESTIONS[this.currentQ % QUESTIONS.length];
+            document.getElementById('q-text').innerText = q.q;
+            const box = document.getElementById('options-box');
+            box.innerHTML = '';
+            q.opts.forEach((o, i) => {
+                const d = document.createElement('div');
+                d.className = 'opt-btn';
+                d.innerText = o;
+                d.onclick = () => { if(i === q.a) this.unlock(); else alert("Wrong! Try again."); };
+                box.appendChild(d);
+            });
+        },
+
+        unlock() {
+            const vid = REELS[Math.floor(Math.random() * REELS.length)];
+            document.getElementById('video-player').src = `https://www.youtube.com/embed/${vid}?autoplay=1&controls=0&mute=0`;
+            document.getElementById('lock').classList.add('hidden');
+            const bar = document.getElementById('timer-bar');
+            bar.style.transition = 'width 15s linear';
+            bar.style.width = '100%';
+            
+            setTimeout(() => {
+                document.getElementById('lock').classList.remove('hidden');
+                document.getElementById('video-player').src = "";
+                bar.style.transition = 'none';
+                bar.style.width = '0%';
+                this.currentQ++;
+                this.initQuiz();
+            }, 15000);
         }
-    },
+    };
 
-    async checkUser(){
-        const { data: { user } } = await supabase.auth.getUser();
-        if(user){
-            document.getElementById('welcome-msg').innerText = `Hello, ${user.user_metadata.full_name || 'Ube Student'}! 👋`;
-            this.showView('view-dash');
-        }
-    },
+    // --- BUTTON LISTENERS ---
+    document.getElementById("authBtn").onclick = () => app.handleAuth();
+    document.getElementById("toggleMode").onclick = () => {
+        app.isLogin = !app.isLogin;
+        document.getElementById("formTitle").innerText = app.isLogin ? "Login" : "Sign Up";
+        document.getElementById("authBtn").innerText = app.isLogin ? "Login" : "Create Account";
+        document.getElementById("name").classList.toggle("hidden", app.isLogin);
+        document.getElementById("toggleMode").innerText = app.isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login";
+    };
 
-    async logout(){
-        await supabase.auth.signOut();
-        location.reload();
-    }
-};
-
-// --- LOGIN/SIGNUP TOGGLE ---
-document.getElementById("authBtn").onclick = () => app.handleAuth();
-document.getElementById("toggleMode").onclick = ()=>{
-    app.isLogin = !app.isLogin;
-    document.getElementById("formTitle").innerText = app.isLogin ? "Login" : "Sign Up";
-    document.getElementById("authBtn").innerText = app.isLogin ? "Login" : "Create Account";
-    document.getElementById("name").style.display = app.isLogin ? "none" : "block";
-    document.getElementById("toggleMode").innerText = app.isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login";
-};
-
-// --- DASHBOARD FUNCTIONS ---
-let currentSubject = "";
-function selectSubject(subject){
-    currentSubject = subject;
-    document.getElementById('selectedSubject').innerText = subject;
-    document.getElementById('modeSelection').classList.add('active');
-}
-function cancelSubject(){ document.getElementById('modeSelection').classList.remove('active'); }
-
-// --- QUIZ FUNCTIONS ---
-function startQuiz(items){
-    document.getElementById('modeSelection').classList.remove('active');
-    app.showView('view-quiz');
-    initQuiz();
-}
-function backToDash(){ app.showView('view-dash'); }
-
-// --- QUIZ LOGIC ---
-let currentQIndex = 0;
-function initQuiz(){
-    const q = QUESTIONS[currentQIndex % QUESTIONS.length];
-    document.getElementById('q-text').innerText = q.q;
-    const box = document.getElementById('options-box');
-    box.innerHTML = '';
-    q.opts.forEach((o,i)=>{
-        const d = document.createElement('div');
-        d.className='opt-btn';
-        d.innerText=o;
-        d.onclick = ()=>{
-            if(i===q.a) unlock(); else alert("Wrong! Try again.");
-        };
-        box.appendChild(d);
-    });
-}
-function unlock(){
-    const vid = REELS[Math.floor(Math.random()*REELS.length)];
-    document.getElementById('video-player').src = `https://www.youtube.com/embed/${vid}?autoplay=1&controls=0&mute=0`;
-    document.getElementById('lock').classList.add('hidden');
-    const bar = document.getElementById('timer-bar');
-    bar.style.transition = 'width 15s linear'; bar.style.width='100%';
-    setTimeout(()=>{
-        document.getElementById('lock').classList.remove('hidden');
-        document.getElementById('video-player').src="";
-        bar.style.transition='none'; bar.style.width='0%';
-        currentQIndex++;
-        initQuiz();
-    },15000);
-}
-
-// --- CHECK LOGIN ON LOAD ---
-app.checkUser();
+    app.checkUser();
 </script>
 </body>
 </html>
