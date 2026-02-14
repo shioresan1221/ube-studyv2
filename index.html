@@ -6,19 +6,20 @@
     <title>UbeStudy</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.js"></script>
+    
     <style>
         :root { --ube: #957DAD; --dark-ube: #4A148C; --light-ube: #F3E5F5; --bg: #F8F9FE; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Nunito', sans-serif; }
-        body { background: var(--bg); color: #333; overflow-x: hidden; }
+        body { background: var(--bg); color: #333; }
         .view { display: none; min-height: 100vh; width: 100%; align-items: center; justify-content: center; flex-direction: column; padding: 20px; }
         .view.active { display: flex; }
         .card { background: white; padding: 40px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; max-width: 360px; text-align: center; }
-        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 2px solid #EEE; outline: none; }
-        .btn { width: 100%; padding: 15px; background: var(--ube); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 15px; transition: 0.3s; }
-        .btn:hover { background: var(--dark-ube); }
-        .phone-frame { width: 320px; height: 580px; background: #000; border: 8px solid #333; border-radius: 40px; position: relative; overflow: hidden; margin-top: 20px; }
-        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; transition: 0.5s; }
+        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 2px solid #EEE; outline: none; font-size: 16px; }
+        .btn { width: 100%; padding: 15px; background: var(--ube); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 15px; font-size: 16px; }
+        .phone-frame { width: 310px; height: 550px; background: #000; border: 8px solid #333; border-radius: 40px; position: relative; overflow: hidden; margin-top: 20px; }
+        .lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
         .lock-overlay.hidden { opacity: 0; pointer-events: none; }
         .opt-btn { background: #F0F0F0; padding: 12px; border-radius: 10px; margin: 8px 0; cursor: pointer; font-weight: 600; width: 100%; text-align: center; }
         .timer-line { position: absolute; bottom: 0; left: 0; height: 6px; background: var(--ube); width: 0%; z-index: 20; }
@@ -29,7 +30,6 @@
     <div id="view-login" class="view active">
         <div class="card">
             <h1 style="color: var(--dark-ube);">🍠 UbeStudy</h1>
-            <p style="color: #888; margin-bottom: 10px;">Login</p>
             <input type="email" id="login-email" placeholder="Email">
             <input type="password" id="login-pass" placeholder="Password">
             <button class="btn" onclick="app.login()">Login</button>
@@ -49,12 +49,12 @@
     </div>
 
     <div id="view-dash" class="view">
-        <h1 id="user-title" style="color: var(--dark-ube); margin-bottom: 20px;">Hello! 👋</h1>
+        <h1 id="user-title" style="color: var(--dark-ube);">Hello! 👋</h1>
         <button class="btn" style="max-width:300px" onclick="app.show('view-reward')">Start Reward Mode</button>
         <button onclick="app.logout()" style="margin-top: 30px; background: none; border: none; color: #AAA; cursor: pointer;">Sign Out</button>
     </div>
 
-    <div id="view-reward" class="view" style="background: #f0f2f5;">
+    <div id="view-reward" class="view">
         <div class="card" style="margin-bottom: 20px;">
             <h3 id="q-text">Loading...</h3>
             <div id="options-box"></div>
@@ -63,7 +63,7 @@
             <iframe id="video-player" src="" frameborder="0" style="width:100%; height:100%;"></iframe>
             <div id="lock" class="lock-overlay">
                 <i class="fa-solid fa-lock" style="font-size: 30px; margin-bottom: 10px; color: var(--ube);"></i>
-                <p>Solve to Unlock 15s</p>
+                <p>Solve to Unlock</p>
             </div>
             <div id="timer-bar" class="timer-line"></div>
         </div>
@@ -71,10 +71,16 @@
     </div>
 
     <script>
-        // Use YOUR URL and ONLY the Publishable key
+        // Use ONLY the Publishable key - Project ID extracted from your URL
         const SUPABASE_URL = 'https://lhz46yyisbtub-9ksd9um.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_lhz46yyiSbTUb-9ksd9umA_vQJIdl3Q';
-        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        let sb;
+        try {
+            sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } catch(e) {
+            console.error("Supabase load error:", e);
+        }
 
         const QUESTIONS = [
             { q: "Gestation of a sow?", a: 0, opts: ["114 Days", "150 Days", "200 Days"] },
@@ -93,21 +99,37 @@
                 const email = document.getElementById('reg-email').value;
                 const password = document.getElementById('reg-pass').value;
                 const name = document.getElementById('reg-name').value;
-                const { error } = await sb.auth.signUp({ email, password, options: { data: { full_name: name } } });
-                if(error) alert(error.message); else { alert("Account created! Now please Login."); this.show('view-login'); }
+                
+                try {
+                    const { data, error } = await sb.auth.signUp({ 
+                        email, 
+                        password, 
+                        options: { data: { full_name: name } } 
+                    });
+                    if(error) throw error;
+                    alert("Success! Check Supabase Users tab.");
+                    this.show('view-login');
+                } catch(err) {
+                    alert("Error: " + err.message);
+                }
             },
             async login() {
-                const { error } = await sb.auth.signInWithPassword({ 
-                    email: document.getElementById('login-email').value, 
-                    password: document.getElementById('login-pass').value 
-                });
-                if(error) alert(error.message); else this.checkUser();
+                try {
+                    const { error } = await sb.auth.signInWithPassword({ 
+                        email: document.getElementById('login-email').value, 
+                        password: document.getElementById('login-pass').value 
+                    });
+                    if(error) throw error;
+                    this.checkUser();
+                } catch(err) {
+                    alert("Login Error: " + err.message);
+                }
             },
             async logout() { await sb.auth.signOut(); this.show('view-login'); },
             async checkUser() {
                 const { data: { user } } = await sb.auth.getUser();
                 if(user) {
-                    document.getElementById('user-title').innerText = `Hello, ${user.user_metadata.full_name}! 👋`;
+                    document.getElementById('user-title').innerText = `Hello, ${user.user_metadata.full_name || 'Ube Student'}! 👋`;
                     this.show('view-dash');
                 }
             },
@@ -120,7 +142,7 @@
                     const d = document.createElement('div');
                     d.className = 'opt-btn';
                     d.innerText = o;
-                    d.onclick = () => { if(i === q.a) this.unlock(); else alert("Wrong! Try again."); };
+                    d.onclick = () => { if(i === q.a) this.unlock(); else alert("Try again!"); };
                     box.appendChild(d);
                 });
             },
