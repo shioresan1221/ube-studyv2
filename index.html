@@ -4,97 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UbeStudy</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --ube: #957DAD; --dark-ube: #4A148C; --bg: #F8F9FE; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Nunito', sans-serif; }
-        body { background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .view { display: none; width: 100%; max-width: 400px; padding: 20px; text-align: center; }
-        .view.active { display: flex; flex-direction: column; }
-        .card { background: white; padding: 30px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; outline: none; }
-        .btn { width: 100%; padding: 15px; background: var(--ube); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 10px; }
+        body { font-family: sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 320px; text-align: center; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; background: var(--ube); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="view-login" class="view active">
-        <div class="card">
-            <h1 style="color: var(--dark-ube);">🍠 UbeStudy</h1>
-            <input type="email" id="l-email" placeholder="Email">
-            <input type="password" id="l-pass" placeholder="Password">
-            <button class="btn" onclick="app.login()">Login</button>
-            <p style="margin-top: 15px; font-size: 14px;">New? <a href="#" onclick="app.show('view-signup')">Sign Up</a></p>
+    <div id="auth-container" class="card">
+        <h2 id="title" style="color: var(--dark-ube)">🍠 UbeStudy</h2>
+        <div id="signup-fields">
+            <input type="text" id="name" placeholder="Full Name">
         </div>
-    </div>
-
-    <div id="view-signup" class="view">
-        <div class="card">
-            <h2 style="color: var(--dark-ube)">Create Account</h2>
-            <input type="text" id="r-name" placeholder="Full Name">
-            <input type="email" id="r-email" placeholder="Email">
-            <input type="password" id="r-pass" placeholder="Password (min 6 chars)">
-            <button class="btn" onclick="app.signup()">Join the Ube Club</button>
-            <p style="margin-top: 15px; font-size: 14px;"><a href="#" onclick="app.show('view-login')">Back to Login</a></p>
-        </div>
-    </div>
-
-    <div id="view-dash" class="view">
-        <h1 id="user-title">Hello! 👋</h1>
-        <p>You are successfully connected to Supabase!</p>
-        <button class="btn" onclick="app.logout()">Logout</button>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="pass" placeholder="Password">
+        <button class="btn" id="main-btn" onclick="handleAuth()">Join the Ube Club</button>
+        <p style="font-size: 12px; margin-top: 15px; cursor: pointer; color: var(--ube)" onclick="toggleMode()" id="toggle-text">Already have an account? Login</p>
     </div>
 
     <script>
-        const S_URL = 'https://lhz46yyisbtub-9ksd9um.supabase.co';
-        const S_KEY = 'sb_publishable_lhz46yyiSbTUb-9ksd9umA_vQJIdl3Q';
-        const sb = supabase.createClient(S_URL, S_KEY);
+        // TRIPLE CHECK THESE COPIED FROM YOUR SUPABASE SETTINGS
+        const SB_URL = 'https://lhz46yyisbtub-9ksd9um.supabase.co';
+        const SB_KEY = 'sb_publishable_lhz46yyiSbTUb-9ksd9umA_vQJIdl3Q';
+        
+        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+        let isLogin = false;
 
-        const app = {
-            show(id) {
-                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-                document.getElementById(id).classList.add('active');
-            },
-            async signup() {
-                const email = document.getElementById('r-email').value;
-                const password = document.getElementById('r-pass').value;
-                const name = document.getElementById('r-name').value;
+        function toggleMode() {
+            isLogin = !isLogin;
+            document.getElementById('title').innerText = isLogin ? '🍠 Ube Login' : '🍠 UbeStudy';
+            document.getElementById('signup-fields').classList.toggle('hidden', isLogin);
+            document.getElementById('main-btn').innerText = isLogin ? 'Login' : 'Join the Ube Club';
+            document.getElementById('toggle-text').innerText = isLogin ? "New? Create Account" : "Already have an account? Login";
+        }
 
-                // Attempting the connection
-                const { data, error } = await sb.auth.signUp({
-                    email, 
-                    password,
-                    options: { data: { full_name: name } }
-                });
+        async function handleAuth() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('pass').value;
+            const name = document.getElementById('name').value;
 
-                if (error) {
-                    console.error(error);
-                    alert("Connection Refused: " + error.message + "\nCheck if Email Confirmation is OFF in Supabase.");
+            try {
+                if (isLogin) {
+                    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                    alert("Logged in! Ready to study.");
                 } else {
-                    alert("Account Created! You should see yourself in the Users list now.");
-                    this.show('view-login');
+                    const { data, error } = await supabaseClient.auth.signUp({
+                        email, password,
+                        options: { data: { full_name: name } }
+                    });
+                    if (error) throw error;
+                    alert("Account Created! Refresh your Supabase Users tab now.");
                 }
-            },
-            async login() {
-                const { data, error } = await sb.auth.signInWithPassword({
-                    email: document.getElementById('l-email').value,
-                    password: document.getElementById('l-pass').value
-                });
-                if (error) alert(error.message);
-                else this.checkUser();
-            },
-            async logout() { await sb.auth.signOut(); this.show('view-login'); },
-            async checkUser() {
-                const { data: { user } } = await sb.auth.getUser();
-                if(user) {
-                    document.getElementById('user-title').innerText = "Hello, " + (user.user_metadata.full_name || "Student") + "!";
-                    this.show('view-dash');
-                }
+            } catch (err) {
+                console.error(err);
+                alert("Connection Error: " + err.message + "\n\nTip: Make sure you are using HTTPS and that 'Confirm Email' is OFF in Supabase.");
             }
-        };
-        app.checkUser();
+        }
     </script>
 </body>
 </html>
