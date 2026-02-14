@@ -1,84 +1,170 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>UbeStudy - Live</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<title>UbeStudy Auth</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
 
-    <style>
-        :root { --ube: #957DAD; --dark-ube: #4A148C; --bg: #F8F9FE; }
-        * { box-sizing: border-box; font-family: 'Nunito', sans-serif; }
-        body {
-            background: var(--bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-        .card {
-            background: white;
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            width: 100%;
-            max-width: 360px;
-            text-align: center;
-        }
-        input {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border-radius: 12px;
-            border: 2px solid #EEE;
-            outline: none;
-            font-size: 16px;
-        }
-        .btn {
-            width: 100%;
-            padding: 15px;
-            background: var(--ube);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            margin-top: 15px;
-        }
-        .btn:hover {
-            background: var(--dark-ube);
-        }
-        #status {
-            margin-top: 15px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-    </style>
+<style>
+:root { --ube:#957DAD; --dark:#4A148C; --bg:#F8F9FE; }
+* { box-sizing:border-box; font-family:'Nunito', sans-serif; }
+body {
+    background:var(--bg);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    margin:0;
+}
+.card {
+    background:white;
+    padding:40px;
+    border-radius:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.05);
+    width:100%;
+    max-width:380px;
+    text-align:center;
+}
+input {
+    width:100%;
+    padding:14px;
+    margin:10px 0;
+    border-radius:12px;
+    border:2px solid #eee;
+    font-size:15px;
+}
+button {
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:12px;
+    font-weight:800;
+    cursor:pointer;
+    margin-top:15px;
+    background:var(--ube);
+    color:white;
+}
+button:hover { background:var(--dark); }
+.switch {
+    margin-top:15px;
+    font-size:14px;
+    cursor:pointer;
+    color:var(--dark);
+}
+#status { margin-top:15px; font-weight:bold; font-size:14px; }
+.hidden { display:none; }
+</style>
 </head>
 <body>
 
 <div class="card">
-    <h1 style="color: var(--dark-ube);">🍠 UbeStudy</h1>
-    <p>Create your account</p>
+    <h1 style="color:var(--dark)">🍠 UbeStudy</h1>
+    <h3 id="formTitle">Sign Up</h3>
 
     <input type="text" id="name" placeholder="Full Name">
     <input type="email" id="email" placeholder="Email">
-    <input type="password" id="pass" placeholder="Password (min 6 chars)">
-    <button class="btn" onclick="signUp()">Join the Ube Club</button>
+    <input type="password" id="password" placeholder="Password">
+
+    <button id="authBtn">Create Account</button>
+
+    <div class="switch" id="toggleMode">
+        Already have an account? Login
+    </div>
 
     <div id="status"></div>
 </div>
 
-<!-- ✅ Supabase v2 ESM Version (IMPORTANT FIX) -->
 <script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-    // 🔥 REPLACE THESE WITH YOUR REAL VALUES
-    const SB_URL = "https://YOUR_PROJECT_ID.supabase.co";
-    const SB_KEY = "YOUR_ANON_PUBLIC_KEY";
+/* 🔥 REPLACE THESE */
+const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co";
+const SUPABASE_KEY = "YOUR_ANON_PUBLIC_KEY";
 
-    const supabase = createClient(SB_URL, SB_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    window.signUp = async function () {
-        const email = document.getElementById('email').value;
+let isLogin = false;
+
+const nameInput = document.getElementById("name");
+const emailInput = document.getElementById("email");
+const passInput = document.getElementById("password");
+const authBtn = document.getElementById("authBtn");
+const toggle = document.getElementById("toggleMode");
+const statusDiv = document.getElementById("status");
+const title = document.getElementById("formTitle");
+
+toggle.addEventListener("click", () => {
+    isLogin = !isLogin;
+
+    if (isLogin) {
+        title.innerText = "Login";
+        authBtn.innerText = "Login";
+        nameInput.classList.add("hidden");
+        toggle.innerText = "Don't have an account? Sign Up";
+    } else {
+        title.innerText = "Sign Up";
+        authBtn.innerText = "Create Account";
+        nameInput.classList.remove("hidden");
+        toggle.innerText = "Already have an account? Login";
+    }
+
+    statusDiv.innerText = "";
+});
+
+authBtn.addEventListener("click", async () => {
+    const email = emailInput.value;
+    const password = passInput.value;
+    const name = nameInput.value;
+
+    if (!email || !password) {
+        statusDiv.style.color = "red";
+        statusDiv.innerText = "Fill all required fields.";
+        return;
+    }
+
+    statusDiv.style.color = "blue";
+    statusDiv.innerText = "Processing...";
+
+    try {
+        let response;
+
+        if (isLogin) {
+            response = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
+        } else {
+            if (!name) {
+                statusDiv.style.color = "red";
+                statusDiv.innerText = "Name required for signup.";
+                return;
+            }
+
+            response = await supabase.auth.signUp({
+                email,
+                password,
+                options: { data: { full_name: name } }
+            });
+        }
+
+        if (response.error) throw response.error;
+
+        statusDiv.style.color = "green";
+        statusDiv.innerText = isLogin 
+            ? "Login successful 🎉"
+            : "Signup successful! Check your email.";
+
+        console.log(response.data);
+
+    } catch (err) {
+        statusDiv.style.color = "red";
+        statusDiv.innerText = err.message;
+        console.error(err);
+    }
+});
+</script>
+
+</body>
+</html>
+
