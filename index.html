@@ -6,36 +6,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <style>
 :root { --ube:#957DAD; --dark:#4A148C; --bg:#F8F9FE; }
 * { box-sizing:border-box; font-family:'Nunito', sans-serif; }
-body { background:var(--bg); margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; }
+body { background:var(--bg); margin:0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
 
-.view { display:none; width:100%; max-width:400px; padding:20px; text-align:center; }
-.view.active { display:flex; flex-direction:column; align-items:center; }
+.view { display: none; width: 100%; max-width: 400px; padding: 20px; text-align: center; }
+.view.active { display: flex; flex-direction: column; align-items: center; }
 
-.card { background:white; padding:40px; border-radius:25px; box-shadow:0 10px 30px rgba(0,0,0,0.05); width:100%; }
-input { width:100%; padding:14px; margin:10px 0; border-radius:12px; border:2px solid #eee; font-size:15px; outline:none; }
+.card { background:white; padding:40px; border-radius:25px; box-shadow:0 10px 30px rgba(0,0,0,0.05); width: 100%; }
+input { width:100%; padding:14px; margin:10px 0; border-radius:12px; border:2px solid #eee; font-size:15px; outline: none; }
 
-button { width:100%; padding:15px; border:none; border-radius:12px; font-weight:800; cursor:pointer; margin-top:15px; background:var(--ube); color:white; transition:0.3s; }
+button { width:100%; padding:15px; border:none; border-radius:12px; font-weight:800; cursor:pointer; margin-top:15px; background:var(--ube); color:white; transition: 0.3s; }
 button:hover { background:var(--dark); }
 
-/* Reward Mode Styles */
-.phone-frame { width:300px; height:540px; background:#000; border:8px solid #333; border-radius:40px; position:relative; overflow:hidden; margin-top:20px; }
-.lock-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.9); z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; transition:0.5s; }
-.lock-overlay.hidden { opacity:0; pointer-events:none; }
-.opt-btn { background:#F0F0F0; padding:12px; border-radius:10px; margin:8px 0; cursor:pointer; font-weight:600; width:100%; text-align:center; color:#333; }
-.timer-line { position:absolute; bottom:0; left:0; height:6px; background:var(--ube); width:0%; z-index:20; }
+.phone-frame { width: 300px; height: 540px; background: #000; border: 8px solid #333; border-radius: 40px; position: relative; overflow: hidden; margin-top: 20px; }
+.lock-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.9); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; transition: 0.5s; }
+.lock-overlay.hidden { opacity: 0; pointer-events: none; }
+.opt-btn { background: #F0F0F0; padding: 12px; border-radius: 10px; margin: 8px 0; cursor: pointer; font-weight: 600; width: 100%; text-align: center; color: #333; }
+.timer-line { position: absolute; bottom: 0; left: 0; height: 6px; background: var(--ube); width: 0%; z-index: 20; }
 
-.switch { margin-top:15px; font-size:14px; cursor:pointer; color:var(--dark); font-weight:700; }
+.switch { margin-top:15px; font-size:14px; cursor:pointer; color:var(--dark); font-weight: 700; }
 #status { margin-top:15px; font-weight:bold; font-size:14px; }
 .hidden { display:none; }
 </style>
 </head>
 <body>
 
-<!-- AUTH VIEW -->
 <div id="view-auth" class="view active">
   <div class="card">
     <h1 style="color:var(--dark)">🍠 UbeStudy</h1>
@@ -49,7 +46,6 @@ button:hover { background:var(--dark); }
   </div>
 </div>
 
-<!-- DASHBOARD VIEW -->
 <div id="view-dash" class="view">
   <h1 id="welcome-msg" style="color:var(--dark)">Welcome!</h1>
   <div class="card">
@@ -59,17 +55,16 @@ button:hover { background:var(--dark); }
   </div>
 </div>
 
-<!-- REWARD VIEW -->
 <div id="view-reward" class="view">
-  <div class="card" style="margin-bottom:15px; padding:20px;">
+  <div class="card" style="margin-bottom: 15px; padding: 20px;">
     <h3 id="q-text" style="margin:0;">Loading Question...</h3>
     <div id="options-box" style="margin-top:10px;"></div>
   </div>
 
   <div class="phone-frame">
-    <iframe id="video-player" src="" frameborder="0" style="width:100%; height:100%; pointer-events:none;"></iframe>
+    <iframe id="video-player" src="" frameborder="0" style="width:100%; height:100%; pointer-events: none;"></iframe>
     <div id="lock" class="lock-overlay">
-      <i class="fa-solid fa-lock" style="font-size:30px; margin-bottom:10px; color:var(--ube)"></i>
+      <i class="fa-solid fa-lock" style="font-size: 30px; margin-bottom: 10px; color: var(--ube);"></i>
       <p>Solve Question to Unlock</p>
     </div>
     <div id="timer-bar" class="timer-line"></div>
@@ -80,30 +75,28 @@ button:hover { background:var(--dark); }
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-// --- SUPABASE CONFIGURATION ---
+// --- CONFIG ---
 const SUPABASE_URL = "https://tbftpvkydneckzdpfdev.supabase.co";
-// Use your anon/public key from Supabase settings
-const SUPABASE_KEY = "PASTE_YOUR_ANON_KEY_HERE";
+const SUPABASE_KEY = "sb_publishable_lhz46yyiSbTUb-9ksd9umA_vQJIdl3Q"; // ✅ Your anon/public key
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// --- APP DATA ---
+// --- QUESTIONS & VIDEOS ---
 const QUESTIONS = [
   { q: "Gestation period of a sow?", a: 0, opts: ["114 Days", "150 Days", "200 Days"] },
   { q: "Main nutrient in corn?", a: 1, opts: ["Fat", "Carbohydrates", "Protein"] },
   { q: "What is 15 x 4?", a: 2, opts: ["50", "45", "60"] }
 ];
-const REELS = ["tG7tuqXo5zQ", "ArU1b5j-JQI", "CDtP8nZ-0aU"];
+const REELS = ["tG7tuqXo5zQ","ArU1b5j-JQI","CDtP8nZ-0aU"];
 
-// --- APP LOGIC ---
 window.app = {
   isLogin: false,
   currentQ: 0,
 
   showView(id) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    if (id === 'view-reward') this.initQuiz();
+    if(id==='view-reward') this.initQuiz();
   },
 
   async handleAuth() {
@@ -112,33 +105,27 @@ window.app = {
     const name = document.getElementById("name").value;
     const status = document.getElementById("status");
 
-    status.style.color = "blue";
-    status.innerText = "Processing...";
+    status.style.color="blue"; status.innerText="Processing...";
 
     try {
       let res;
-      if (this.isLogin) {
+      if(this.isLogin){
         res = await supabase.auth.signInWithPassword({ email, password });
-        if (res.error) throw res.error;
       } else {
-        res = await supabase.auth.signUp({ email, password, options: { data: { full_name: name } } });
-        if (res.error) throw res.error;
-        status.style.color = "green";
-        status.innerText = "Signup successful! Please login.";
-        return;
+        res = await supabase.auth.signUp({ email, password, options:{ data:{ full_name:name } } });
       }
+      if(res.error) throw res.error;
 
-      // Login successful
-      this.checkUser();
-    } catch (err) {
-      status.style.color = "red";
-      status.innerText = err.message;
+      if(this.isLogin) this.checkUser();
+      else { status.style.color="green"; status.innerText="Signup successful! Please login."; }
+    } catch(err){
+      status.style.color="red"; status.innerText=err.message;
     }
   },
 
   async checkUser() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
+    const { data:{ user } } = await supabase.auth.getUser();
+    if(user){
       document.getElementById('welcome-msg').innerText = `Hello, ${user.user_metadata.full_name || 'Ube Student'}! 👋`;
       this.showView('view-dash');
     }
@@ -152,50 +139,40 @@ window.app = {
   initQuiz() {
     const q = QUESTIONS[this.currentQ % QUESTIONS.length];
     document.getElementById('q-text').innerText = q.q;
-    const box = document.getElementById('options-box');
-    box.innerHTML = '';
-    q.opts.forEach((o, i) => {
-      const d = document.createElement('div');
-      d.className = 'opt-btn';
-      d.innerText = o;
-      d.onclick = () => { if(i === q.a) this.unlock(); else alert("Wrong! Try again."); };
+    const box = document.getElementById('options-box'); box.innerHTML='';
+    q.opts.forEach((o,i)=>{
+      const d=document.createElement('div'); d.className='opt-btn'; d.innerText=o;
+      d.onclick=()=>{ if(i===q.a) this.unlock(); else alert("Wrong! Try again."); };
       box.appendChild(d);
     });
   },
 
   unlock() {
-    const vid = REELS[Math.floor(Math.random() * REELS.length)];
-    document.getElementById('video-player').src = `https://www.youtube.com/embed/${vid}?autoplay=1&controls=0&mute=0`;
+    const vid = REELS[Math.floor(Math.random()*REELS.length)];
+    document.getElementById('video-player').src=`https://www.youtube.com/embed/${vid}?autoplay=1&controls=0&mute=0`;
     document.getElementById('lock').classList.add('hidden');
-    const bar = document.getElementById('timer-bar');
-    bar.style.transition = 'width 15s linear';
-    bar.style.width = '100%';
-
-    setTimeout(() => {
+    const bar=document.getElementById('timer-bar');
+    bar.style.transition='width 15s linear'; bar.style.width='100%';
+    setTimeout(()=>{
       document.getElementById('lock').classList.remove('hidden');
-      document.getElementById('video-player').src = "";
-      bar.style.transition = 'none';
-      bar.style.width = '0%';
-      this.currentQ++;
-      this.initQuiz();
-    }, 15000);
+      document.getElementById('video-player').src="";
+      bar.style.transition='none'; bar.style.width='0%';
+      this.currentQ++; this.initQuiz();
+    },15000);
   }
 };
 
-// --- BUTTON LISTENERS ---
+// --- BUTTONS ---
 document.getElementById("authBtn").onclick = () => app.handleAuth();
 document.getElementById("toggleMode").onclick = () => {
   app.isLogin = !app.isLogin;
-  document.getElementById("formTitle").innerText = app.isLogin ? "Login" : "Sign Up";
-  document.getElementById("authBtn").innerText = app.isLogin ? "Login" : "Create Account";
+  document.getElementById("formTitle").innerText = app.isLogin?"Login":"Sign Up";
+  document.getElementById("authBtn").innerText = app.isLogin?"Login":"Create Account";
   document.getElementById("name").classList.toggle("hidden", app.isLogin);
-  document.getElementById("toggleMode").innerText = app.isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login";
+  document.getElementById("toggleMode").innerText = app.isLogin?"Don't have an account? Sign Up":"Already have an account? Login";
 };
 
-// --- AUTO CHECK SESSION ---
-supabase.auth.getSession().then(({ data: { session } }) => {
-  if (session) app.checkUser();
-});
+app.checkUser();
 </script>
 </body>
 </html>
