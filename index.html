@@ -78,9 +78,9 @@ button:hover { background:var(--dark); }
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-/* ✅ Correct Supabase Config */
+/* ✅ Supabase config: correct project URL and anon key */
 const SUPABASE_URL = "https://tbftpvkydneckzdpfdev.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiZnRwdmt5ZWNrzdHBmZGV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwNDQxMDIsImV4cCI6MjA4NjYyMDEwMn0.21_APgXQVIeVSuHsNMqa55UGNFOEdDUYvNaUI1_XkY4";
+const SUPABASE_KEY = "sb_publishable_lhz46yyiSbTUb-9ksd9umA_vQJIdl3Q";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -94,10 +94,9 @@ const toggle = document.getElementById("toggleMode");
 const statusDiv = document.getElementById("status");
 const title = document.getElementById("formTitle");
 
-/* Toggle Login / Signup */
+/* Toggle between Login and Signup */
 toggle.addEventListener("click", () => {
     isLogin = !isLogin;
-
     if (isLogin) {
         title.innerText = "Login";
         authBtn.innerText = "Login";
@@ -109,13 +108,11 @@ toggle.addEventListener("click", () => {
         nameInput.classList.remove("hidden");
         toggle.innerText = "Already have an account? Login";
     }
-
     statusDiv.innerText = "";
 });
 
-/* Auth Action */
+/* Handle Signup/Login */
 authBtn.addEventListener("click", async () => {
-
     const email = emailInput.value.trim();
     const password = passInput.value.trim();
     const name = nameInput.value.trim();
