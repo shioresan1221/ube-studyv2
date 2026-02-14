@@ -2,67 +2,83 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UbeStudy - Live</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         :root { --ube: #957DAD; --dark-ube: #4A148C; --bg: #F8F9FE; }
         * { box-sizing: border-box; font-family: 'Nunito', sans-serif; }
-        body { background: var(--bg); display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .card { background: white; padding: 40px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%; max-width: 360px; text-align: center; }
-        input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 2px solid #EEE; outline: none; font-size: 16px; }
-        .btn { width: 100%; padding: 15px; background: var(--ube); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 15px; }
-        #status { margin-top: 15px; font-size: 14px; font-weight: bold; }
+        body {
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border-radius: 12px;
+            border: 2px solid #EEE;
+            outline: none;
+            font-size: 16px;
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--ube);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .btn:hover {
+            background: var(--dark-ube);
+        }
+        #status {
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1 style="color: var(--dark-ube);">🍠 UbeStudy</h1>
-        <p>Create your account</p>
-        <input type="text" id="name" placeholder="Full Name">
-        <input type="email" id="email" placeholder="Email">
-        <input type="password" id="pass" placeholder="Password (min 6 chars)">
-        <button class="btn" onclick="signUp()">Join the Ube Club</button>
-        <div id="status"></div>
-    </div>
+<div class="card">
+    <h1 style="color: var(--dark-ube);">🍠 UbeStudy</h1>
+    <p>Create your account</p>
 
-    <script>
-        // Use YOUR Project URL from the API settings tab
-        // If your URL changed with these new keys, update it below:
-        const SB_URL = 'https://lhz46yyisbtub-9ksd9um.supabase.co'; 
-        const SB_KEY = 'sb_publishable_shyAV-YWkXLKOrWA6xFpAw_znqW0vX4';
+    <input type="text" id="name" placeholder="Full Name">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="pass" placeholder="Password (min 6 chars)">
+    <button class="btn" onclick="signUp()">Join the Ube Club</button>
 
-        const sb = supabase.createClient(SB_URL, SB_KEY);
+    <div id="status"></div>
+</div>
 
-        async function signUp() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('pass').value;
-            const name = document.getElementById('name').value;
-            const status = document.getElementById('status');
+<!-- ✅ Supabase v2 ESM Version (IMPORTANT FIX) -->
+<script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-            status.style.color = "blue";
-            status.innerText = "Processing...";
+    // 🔥 REPLACE THESE WITH YOUR REAL VALUES
+    const SB_URL = "https://YOUR_PROJECT_ID.supabase.co";
+    const SB_KEY = "YOUR_ANON_PUBLIC_KEY";
 
-            try {
-                const { data, error } = await sb.auth.signUp({
-                    email, 
-                    password,
-                    options: { data: { full_name: name } }
-                });
+    const supabase = createClient(SB_URL, SB_KEY);
 
-                if (error) throw error;
-                
-                status.style.color = "green";
-                status.innerText = "Success! User created.";
-                alert("Account Created! Check your Supabase Dashboard.");
-            } catch (err) {
-                status.style.color = "red";
-                status.innerText = "Error: " + err.message;
-                console.error(err);
-            }
-        }
-    </script>
-</body>
-</html>
+    window.signUp = async function () {
+        const email = document.getElementById('email').value;
