@@ -2,50 +2,41 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>🍠 UbeStudy - Learning Dashboard</title>
+<title>🍠 UbeStudy - Full App</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
 :root { --ube:#957DAD; --dark:#4A148C; --bg:#F8F9FE; }
 * { box-sizing:border-box; font-family:'Nunito', sans-serif; }
-body { background:var(--bg); margin:0; min-height:100vh; display:flex; justify-content:center; align-items:flex-start; padding:20px; }
+body { background:var(--bg); margin:0; min-height: 100vh; display:flex; align-items:center; justify-content:center; }
 
 /* Views */
-.view { display:none; width:100%; max-width:600px; text-align:center; }
-.view.active { display:block; }
+.view { display:none; width:100%; max-width:500px; padding:20px; text-align:center; }
+.view.active { display:flex; flex-direction:column; align-items:center; }
 
-/* Card */
-.card { background:white; padding:30px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.05); margin-bottom:20px; }
-input { width:100%; padding:12px; margin:10px 0; border-radius:12px; border:2px solid #eee; font-size:15px; outline:none; }
-button { width:100%; padding:15px; border:none; border-radius:12px; font-weight:700; cursor:pointer; margin-top:10px; background:var(--ube); color:white; transition:0.3s; }
+/* Cards and buttons */
+.card { background:white; padding:30px; border-radius:20px; box-shadow:0 10px 30px rgba(0,0,0,0.05); width:100%; }
+input { width:100%; padding:12px; margin:8px 0; border-radius:10px; border:2px solid #eee; font-size:15px; outline:none; }
+button { width:100%; padding:14px; border:none; border-radius:12px; font-weight:800; cursor:pointer; margin-top:15px; background:var(--ube); color:white; transition:0.3s; }
 button:hover { background:var(--dark); }
-.switch { margin-top:10px; font-size:14px; cursor:pointer; color:var(--dark); font-weight:700; }
+
+/* Subject cards */
+.subject-card { background:#F9F9F9; margin:10px 0; padding:12px; border-radius:12px; cursor:pointer; position:relative; text-align:left; }
+.subject-card:hover .desc { display:block; }
+.desc { display:none; position:absolute; top:0; left:105%; width:200px; background:white; border:1px solid #ccc; padding:10px; border-radius:10px; font-size:13px; box-shadow:0 4px 10px rgba(0,0,0,0.1); z-index:10; }
+
+.level { margin:10px 0; font-size:14px; }
+
+/* Status */
 #status { margin-top:10px; font-weight:bold; font-size:14px; color:red; }
-
-/* Dashboard Subjects */
-.subject-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap:15px; }
-.subject-card { background:#fff; border-radius:15px; padding:20px; box-shadow:0 5px 20px rgba(0,0,0,0.05); cursor:pointer; position:relative; }
-.subject-card:hover .tooltip { display:block; }
-.tooltip { display:none; position:absolute; top:110%; left:50%; transform:translateX(-50%); background:#333; color:white; padding:8px; border-radius:10px; font-size:12px; width:200px; text-align:left; z-index:10; }
-
-/* Level display */
-.level { margin:10px 0; font-weight:700; color:var(--dark); }
-.level span { font-size:20px; }
-
-/* Study Mode */
-.mode-btn { margin:5px; padding:10px 15px; border:none; border-radius:10px; background:var(--ube); color:white; cursor:pointer; }
-.mode-btn:hover { background:var(--dark); }
-
-/* Ranking Table */
-table { width:100%; border-collapse:collapse; margin-top:10px; }
-th, td { border:1px solid #eee; padding:8px; text-align:center; }
-th { background:var(--ube); color:white; border-radius:5px; }
+.switch { margin-top:10px; font-size:14px; cursor:pointer; color:var(--dark); font-weight:700; }
 </style>
 </head>
 <body>
 
-<!-- AUTH VIEW -->
+<!-- Auth View -->
 <div id="view-auth" class="view active">
     <div class="card">
         <h1 style="color:var(--dark)">🍠 UbeStudy</h1>
@@ -59,216 +50,154 @@ th { background:var(--ube); color:white; border-radius:5px; }
     </div>
 </div>
 
-<!-- DASHBOARD VIEW -->
-<div id="view-dash" class="view">
-    <h2 style="color:var(--dark)">Welcome, <span id="userName">Student</span>!</h2>
-    <div class="level">Overall Level: <span id="overallLevel">🌱 Seedling</span></div>
-    <div class="card">
-        <h3>Select Subject</h3>
-        <div class="subject-grid" id="subjectGrid"></div>
-    </div>
-    <div class="card">
-        <h3>Ranking (Overall)</h3>
-        <table id="overallRanking">
-            <thead><tr><th>Rank</th><th>Name</th><th>Points</th></tr></thead>
-            <tbody></tbody>
-        </table>
-    </div>
-    <button onclick="app.logout()" style="background:#ddd;color:#333;">Logout</button>
+<!-- Home / Subject Selection -->
+<div id="view-home" class="view">
+    <h1 style="color:var(--dark)">Welcome, <span id="user-name">Student</span>!</h1>
+    <h3>Select a Subject:</h3>
+    <div id="subjects-container"></div>
+    <div class="level" id="user-level"></div>
+    <button style="background:#ddd;color:#666;" onclick="app.logout()">Logout</button>
 </div>
 
-<!-- SUBJECT VIEW -->
+<!-- Subject Review Mode -->
 <div id="view-subject" class="view">
-    <h2 style="color:var(--dark)" id="subjectTitle"></h2>
-    <div class="level">Subject Level: <span id="subjectLevel">🌱 Seedling</span></div>
-    <div class="card">
-        <h3>Select Study Mode (Number of Items)</h3>
-        <div id="modeButtons"></div>
-    </div>
-    <div class="card">
-        <h3>Subject Ranking</h3>
-        <table id="subjectRanking">
-            <thead><tr><th>Rank</th><th>Name</th><th>Points</th></tr></thead>
-            <tbody></tbody>
-        </table>
-    </div>
-    <button onclick="app.showDashboard()" style="background:none;color:var(--ube);">Back to Dashboard</button>
+    <h2 id="subject-title" style="color:var(--dark)"></h2>
+    <p>Choose number of items:</p>
+    <div id="item-options"></div>
+    <button onclick="app.showView('view-home')" style="background:#ddd;color:#666;margin-top:20px;">Back to Subjects</button>
+</div>
+
+<!-- Ranking -->
+<div id="view-ranking" class="view">
+    <h2 style="color:var(--dark)">Ranking</h2>
+    <div id="ranking-list"></div>
+    <button onclick="app.showView('view-home')" style="background:#ddd;color:#666;margin-top:20px;">Back</button>
 </div>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-// --- CONFIGURATION ---
+// --- CONFIG ---
 const SUPABASE_URL = "https://tbftpvkydneckzdpfdev.supabase.co";
-const SUPABASE_KEY = "PASTE_YOUR_LONG_EYJ_KEY_HERE"; 
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRiZnRwdmt5ZG5lY2t6ZHBmZGV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEwNDQxMDIsImV4cCI6MjA4NjYyMDEwMn0.21_APgXQVIeVSuHsNMqa55UGNFOEdDUYvNaUI1_XkY4";
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// --- SUBJECT DATA ---
+// --- DATA ---
 const SUBJECTS = [
-    { key:"crop_science", name:"Crop Science", desc:"Principles of agronomy, field crops, horticulture, physiology, and plant breeding." },
-    { key:"soil_science", name:"Soil Science", desc:"Soil management, fertility, and conservation." },
-    { key:"crop_protection", name:"Crop Protection", desc:"Plant pests, diseases, and management." },
-    { key:"animal_science", name:"Animal Science", desc:"Livestock production and management." },
-    { key:"agri_econ", name:"Agricultural Economics & Marketing", desc:"Agribusiness and marketing principles." },
-    { key:"agri_ext", name:"Agricultural Extension & Communication", desc:"Communication strategies for agricultural development." }
+    { name:"Crop Science", desc:"Principles of agronomy, field crops, horticulture, physiology, and plant breeding."},
+    { name:"Soil Science", desc:"Focuses on soil management, fertility, and conservation."},
+    { name:"Crop Protection", desc:"Plant pests, diseases, and management."},
+    { name:"Animal Science", desc:"Livestock production and management."},
+    { name:"Agri Economics & Marketing", desc:"Agribusiness and marketing principles."},
+    { name:"Agri Extension & Communication", desc:"Communication strategies for agricultural development."}
 ];
 
-// --- LEVEL SYSTEM ---
-function getLevel(points){
-    if(points>=50) return "👑 Secretary of Agriculture";
-    if(points>=21) return "🌾 Agronomist";
-    if(points>=11) return "🚜 Field Manager";
-    if(points>=6) return "👨‍🌾 Backyard Gardener";
-    return "🌱 Seedling";
-}
+const LEVELS = [
+    { max:5, icon:"🌱 Seedling (Beginner)"},
+    { max:10, icon:"👨‍🌾 Backyard Gardener (Amateur)"},
+    { max:20, icon:"🚜 Field Manager (Intermediate)"},
+    { max:40, icon:"🌾 Agronomist (Advanced)"},
+    { max:50, icon:"👑 Secretary of Agriculture (Top Rank)"}
+];
 
-// --- APP LOGIC ---
+// --- APP ---
 window.app = {
-    user:null,
-    currentSubject:null,
-    
+    user: null,
+    levelPoints: 0,
+
+    showView(id){
+        document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    },
+
     async handleAuth(){
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
         const name = document.getElementById("name").value;
         const status = document.getElementById("status");
+
         status.style.color="blue"; status.innerText="Processing...";
-        try{
+
+        try {
             let res;
             if(this.isLogin){
                 res = await supabase.auth.signInWithPassword({email,password});
-            } else{
-                res = await supabase.auth.signUp({email,password, options:{data:{full_name:name}}});
+            } else {
+                res = await supabase.auth.signUp({email,password,options:{data:{full_name:name}}});
             }
             if(res.error) throw res.error;
-            status.style.color="green";
-            if(this.isLogin){
-                await this.loadDashboard();
-            } else {
-                status.innerText="Signup successful! Please login.";
-            }
-        }catch(err){
-            status.style.color="red";
-            status.innerText=err.message;
+
+            if(this.isLogin) this.loadHome();
+            else {status.style.color="green"; status.innerText="Signup successful! Please login.";}
+        } catch(err){
+            status.style.color="red"; status.innerText=err.message;
         }
     },
 
-    async loadDashboard(){
-        const { data:{ user }} = await supabase.auth.getUser();
-        if(!user) return;
-        this.user=user;
-        document.getElementById("userName").innerText = user.user_metadata.full_name || "Student";
-        document.getElementById("view-auth").classList.remove("active");
-        document.getElementById("view-dash").classList.add("active");
-        this.renderSubjects();
-        this.updateOverallLevel();
-        this.loadRankings();
+    async loadHome(){
+        const { data:{ user } } = await supabase.auth.getUser();
+        if(user){
+            this.user = user;
+            document.getElementById("user-name").innerText = user.user_metadata.full_name || "Student";
+            this.showSubjects();
+            this.showView("view-home");
+        }
     },
 
-    showDashboard(){
-        document.getElementById("view-subject").classList.remove("active");
-        document.getElementById("view-dash").classList.add("active");
-    },
-
-    renderSubjects(){
-        const grid=document.getElementById("subjectGrid");
-        grid.innerHTML="";
-        SUBJECTS.forEach(s=>{
-            const div=document.createElement("div");
-            div.className="subject-card";
-            div.innerHTML=`<strong>${s.name}</strong><div class="tooltip">${s.desc}</div>`;
-            div.onclick=()=>this.selectSubject(s);
-            grid.appendChild(div);
-        });
-    },
-
-    async selectSubject(sub){
-        this.currentSubject=sub;
-        document.getElementById("subjectTitle").innerText=sub.name;
-        document.getElementById("view-dash").classList.remove("active");
-        document.getElementById("view-subject").classList.add("active");
-        this.renderModeButtons();
-        this.updateSubjectLevel();
-        this.loadSubjectRanking();
-    },
-
-    renderModeButtons(){
-        const container=document.getElementById("modeButtons");
-        container.innerHTML="";
-        [15,30,50,70,100].forEach(n=>{
-            const btn=document.createElement("button");
-            btn.className="mode-btn";
-            btn.innerText=n+" Items";
-            btn.onclick=()=>this.markStudied(n);
-            container.appendChild(btn);
-        });
-    },
-
-    async markStudied(count){
-        // Increase points by number of items
-        let pts=count;
-        const { data, error } = await supabase.from("user_points").upsert({ user_id:this.user.id, subject:this.currentSubject.key, points:pts }, {onConflict:["user_id","subject"]});
-        if(error) console.error(error);
-        alert(count+" items marked as studied!");
-        this.updateSubjectLevel();
-        this.updateOverallLevel();
-        this.loadSubjectRanking();
-        this.loadRankings();
-    },
-
-    async updateSubjectLevel(){
-        const { data } = await supabase.from("user_points").select("points").eq("user_id",this.user.id).eq("subject",this.currentSubject.key).single();
-        const pts = data ? data.points : 0;
-        document.getElementById("subjectLevel").innerText=getLevel(pts);
-    },
-
-    async updateOverallLevel(){
-        const { data } = await supabase.from("user_points").select("points").eq("user_id",this.user.id);
-        const total = data.reduce((sum,d)=>sum+d.points,0);
-        document.getElementById("overallLevel").innerText=getLevel(total);
-    },
-
-    async loadRankings(){
-        const { data } = await supabase.from("user_points").select("user_id,points").order("points",{ascending:false});
-        const tbody=document.querySelector("#overallRanking tbody");
-        tbody.innerHTML="";
-        let ranks={};
-        data.forEach((row,i)=>{
-            ranks[row.user_id]=row.points;
-            const tr=document.createElement("tr");
-            tr.innerHTML=`<td>${i+1}</td><td>${row.user_id}</td><td>${row.points}</td>`;
-            tbody.appendChild(tr);
-        });
-    },
-
-    async loadSubjectRanking(){
-        const { data } = await supabase.from("user_points").select("user_id,points").eq("subject",this.currentSubject.key).order("points",{ascending:false});
-        const tbody=document.querySelector("#subjectRanking tbody");
-        tbody.innerHTML="";
-        data.forEach((row,i)=>{
-            const tr=document.createElement("tr");
-            tr.innerHTML=`<td>${i+1}</td><td>${row.user_id}</td><td>${row.points}</td>`;
-            tbody.appendChild(tr);
-        });
-    },
-
-    async logout(){
+    logout: async function(){
         await supabase.auth.signOut();
         location.reload();
+    },
+
+    showSubjects(){
+        const container = document.getElementById("subjects-container");
+        container.innerHTML="";
+        SUBJECTS.forEach(sub=>{
+            const div = document.createElement("div");
+            div.className="subject-card";
+            div.innerText=sub.name;
+            const desc = document.createElement("div");
+            desc.className="desc";
+            desc.innerText=sub.desc;
+            div.appendChild(desc);
+            div.onclick = () => this.selectSubject(sub);
+            container.appendChild(div);
+        });
+        this.showLevel();
+    },
+
+    showLevel(){
+        let lvl = LEVELS.find(l=>this.levelPoints<=l.max) || LEVELS[LEVELS.length-1];
+        document.getElementById("user-level").innerText = `Level: ${lvl.icon} | Points: ${this.levelPoints}`;
+    },
+
+    selectSubject(sub){
+        document.getElementById("subject-title").innerText=sub.name;
+        const container = document.getElementById("item-options");
+        container.innerHTML="";
+        [15,30,50,70,100].forEach(n=>{
+            const btn = document.createElement("button");
+            btn.innerText=`${n} items`;
+            btn.onclick = () => alert(`You selected ${n} items for ${sub.name} review!`);
+            container.appendChild(btn);
+        });
+        this.showView("view-subject");
     }
 };
 
+// --- BUTTON LISTENERS ---
 document.getElementById("authBtn").onclick=()=>app.handleAuth();
 document.getElementById("toggleMode").onclick=()=>{
-    app.isLogin=!app.isLogin;
-    document.getElementById("formTitle").innerText = app.isLogin ? "Login":"Sign Up";
-    document.getElementById("authBtn").innerText = app.isLogin ? "Login":"Create Account";
-    document.getElementById("name").style.display=app.isLogin ? "none":"block";
-    document.getElementById("toggleMode").innerText = app.isLogin ? "Don't have an account? Sign Up":"Already have an account? Login";
+    app.isLogin = !app.isLogin;
+    document.getElementById("formTitle").innerText = app.isLogin ? "Login" : "Sign Up";
+    document.getElementById("authBtn").innerText = app.isLogin ? "Login" : "Create Account";
+    document.getElementById("name").classList.toggle("hidden", app.isLogin);
+    document.getElementById("toggleMode").innerText = app.isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login";
 };
 
-// Auto-check user
-supabase.auth.getUser().then(({data:{user}})=>{ if(user) app.loadDashboard(); });
+// --- CHECK LOGIN ---
+app.loadHome();
 
 </script>
 </body>
